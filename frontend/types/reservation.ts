@@ -1,0 +1,20 @@
+export interface Reservation {
+  id: string;
+  queue_number: number;
+  name: string;
+  status: 'waiting' | 'in_progress' | 'completed' | 'cancelled';
+  created_at: string;
+  started_at?: string;
+  completed_at?: string;
+}
+
+export interface WaitInfo {
+  queue_number: number;
+  position: number;
+  estimated_wait_minutes: number;
+  current_status: string;
+}
+
+export interface ReservationCreate {
+  name: string;
+}
