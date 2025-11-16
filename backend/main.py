@@ -282,16 +282,18 @@ async def get_stats():
         for _ in range(available_slots):
             slot_available_times.insert(0, 0)
 
-        # 待機中の人を順番に割り当てて、最後の人の待ち時間を計算
-        if waiting_count == 0:
-            estimated_wait_minutes = 0
-        else:
-            # 待機中の人数分のタイムラインを作成
-            # slot_available_times が MAX_CONCURRENT_EXPERIENCES より少ない場合は0で埋める
-            timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
-            while len(timeline) < MAX_CONCURRENT_EXPERIENCES:
-                timeline.append(0)
+        # 待機中の人を順番に割り当てて、最後の人（または今登録する人）の待ち時間を計算
+        # タイムラインを作成
+        timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
+        while len(timeline) < MAX_CONCURRENT_EXPERIENCES:
+            timeline.append(0)
 
+        if waiting_count == 0:
+            # 待機中の人がいない場合、今登録する人の待ち時間
+            # = 次に空く枠までの時間
+            estimated_wait_minutes = int(math.ceil(min(timeline)))
+        else:
+            # 待機中の人がいる場合、最後の人の待ち時間を計算
             for i in range(waiting_count):
                 # 一番早く空く枠を使用
                 earliest_available = min(timeline)
