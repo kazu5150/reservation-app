@@ -113,7 +113,7 @@ export default function Home() {
                       <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-gray-900">{seat.seat_name}</span>
-                          <span className="text-sm text-gray-600">{seat.name}</span>
+                          <span className="text-sm text-gray-600">{seat.name}様</span>
                         </div>
                         <span className="text-sm font-semibold text-blue-600">
                           残り {Math.ceil(seat.remaining_minutes)}分
