@@ -19,9 +19,16 @@ export interface ReservationCreate {
   name: string;
 }
 
+export interface Seat {
+  seat_name: string;
+  name: string;
+  remaining_minutes: number;
+}
+
 export interface Stats {
   waiting_count: number;
   in_progress_count: number;
   completed_count: number;
   estimated_wait_minutes: number;
+  seats: Seat[];
 }

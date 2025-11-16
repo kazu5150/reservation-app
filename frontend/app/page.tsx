@@ -94,13 +94,43 @@ export default function Home() {
             </div>
 
             {/* 予想待ち時間 */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center mb-4">
               <div className="text-blue-800 text-sm font-semibold mb-1">予想待ち時間</div>
               <div className="text-5xl font-bold text-blue-900">
                 {stats.estimated_wait_minutes}
               </div>
               <div className="text-blue-700 text-xs mt-1">分</div>
             </div>
+
+            {/* 席の状況 */}
+            {stats.seats && stats.seats.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">各席の状況</h3>
+                {stats.seats.map((seat) => {
+                  const progress = (seat.remaining_minutes / 10) * 100;
+                  return (
+                    <div key={seat.seat_name} className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-gray-900">{seat.seat_name}</span>
+                          <span className="text-sm text-gray-600">{seat.name}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-blue-600">
+                          残り {Math.ceil(seat.remaining_minutes)}分
+                        </span>
+                      </div>
+                      {/* プログレスバー */}
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-500"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
