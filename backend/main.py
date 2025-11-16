@@ -117,30 +117,63 @@ async def get_wait_info(queue_number: int):
         reservation = reservation_response.data[0]
 
         # 自分より前の待機中の人数を計算
-        waiting_before = supabase.table("reservations").select("*", count="exact").lt("queue_number", queue_number).eq("status", "waiting").execute()
-        waiting_before_count = waiting_before.count if waiting_before.count is not None else 0
+        waiting_before = supabase.table("reservations").select("*").lt("queue_number", queue_number).eq("status", "waiting").order("queue_number").execute()
+        waiting_before_count = len(waiting_before.data) if waiting_before.data else 0
 
-        # 現在体験中の人数を取得
-        in_progress_response = supabase.table("reservations").select("*", count="exact").eq("status", "in_progress").execute()
-        in_progress_count = in_progress_response.count if in_progress_response.count is not None else 0
+        # 現在体験中の予約を取得
+        in_progress_response = supabase.table("reservations").select("*").eq("status", "in_progress").execute()
+        in_progress_count = len(in_progress_response.data) if in_progress_response.data else 0
 
         # 自分の順位（待機中の中での順位）
         position = waiting_before_count + 1
 
-        # 予想待ち時間を計算（同時に3人まで体験可能）
-        # 利用可能な枠
-        available_slots = max(0, MAX_CONCURRENT_EXPERIENCES - in_progress_count)
+        # 予想待ち時間を計算（体験開始時刻を考慮）
+        now = datetime.now()
 
-        if waiting_before_count < available_slots:
-            # すぐに始められる
+        # 体験中の各予約の残り時間を計算
+        slot_available_times = []  # 各枠が空くまでの時間（分）
+
+        for res in (in_progress_response.data or []):
+            if res.get("started_at"):
+                started_at = datetime.fromisoformat(res["started_at"].replace('Z', '+00:00'))
+                # 経過時間（分）
+                elapsed_minutes = (now - started_at).total_seconds() / 60
+                # 残り時間（分）
+                remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
+                slot_available_times.append(remaining_minutes)
+
+        # 残り時間でソート（早く空く順）
+        slot_available_times.sort()
+
+        # 利用可能な枠の数
+        available_slots = MAX_CONCURRENT_EXPERIENCES - in_progress_count
+
+        # すぐに使える枠を追加
+        for _ in range(available_slots):
+            slot_available_times.insert(0, 0)
+
+        # 自分より前の人数 + 自分自身を割り当て
+        total_people = waiting_before_count + 1
+
+        if total_people == 0:
             estimated_wait_minutes = 0
         else:
-            # 待つ必要がある人数
-            people_waiting = waiting_before_count - available_slots + 1  # 自分を含む
-            # 必要なラウンド数
-            rounds_needed = math.ceil(people_waiting / MAX_CONCURRENT_EXPERIENCES)
-            # 待ち時間
-            estimated_wait_minutes = rounds_needed * EXPERIENCE_DURATION_MINUTES
+            # タイムラインを作成（最初の3枠）
+            timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
+
+            for i in range(total_people):
+                # 一番早く空く枠を使用
+                earliest_available = min(timeline)
+                # この人の待ち時間
+                wait_time = earliest_available
+
+                # 自分の番の場合、待ち時間を記録
+                if i == total_people - 1:
+                    estimated_wait_minutes = int(math.ceil(wait_time))
+
+                # この枠が次に空く時刻を更新
+                timeline.remove(earliest_available)
+                timeline.append(earliest_available + EXPERIENCE_DURATION_MINUTES)
 
         return WaitInfo(
             queue_number=queue_number,
@@ -199,28 +232,60 @@ async def get_stats():
     """
     try:
         # 各ステータスの件数を取得
-        waiting_response = supabase.table("reservations").select("*", count="exact").eq("status", "waiting").execute()
-        in_progress_response = supabase.table("reservations").select("*", count="exact").eq("status", "in_progress").execute()
+        waiting_response = supabase.table("reservations").select("*").eq("status", "waiting").order("queue_number").execute()
+        in_progress_response = supabase.table("reservations").select("*").eq("status", "in_progress").execute()
         completed_response = supabase.table("reservations").select("*", count="exact").eq("status", "completed").execute()
 
-        waiting_count = waiting_response.count if waiting_response.count is not None else 0
-        in_progress_count = in_progress_response.count if in_progress_response.count is not None else 0
+        waiting_count = len(waiting_response.data) if waiting_response.data else 0
+        in_progress_count = len(in_progress_response.data) if in_progress_response.data else 0
         completed_count = completed_response.count if completed_response.count is not None else 0
 
-        # 現在の予想待ち時間を計算（同時に3人まで体験可能）
-        # 利用可能な枠
-        available_slots = max(0, MAX_CONCURRENT_EXPERIENCES - in_progress_count)
+        # 現在の予想待ち時間を計算（体験開始時刻を考慮）
+        now = datetime.now()
 
-        if waiting_count <= available_slots:
-            # 全員すぐに始められる
+        # 体験中の各予約の残り時間を計算
+        slot_available_times = []  # 各枠が空く時刻
+
+        for reservation in (in_progress_response.data or []):
+            if reservation.get("started_at"):
+                started_at = datetime.fromisoformat(reservation["started_at"].replace('Z', '+00:00'))
+                # 経過時間（分）
+                elapsed_minutes = (now - started_at).total_seconds() / 60
+                # 残り時間（分）
+                remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
+                # この枠が空く時刻
+                available_at = now + (remaining_minutes * 60)  # 秒に変換
+                slot_available_times.append(remaining_minutes)
+
+        # 残り時間でソート（早く空く順）
+        slot_available_times.sort()
+
+        # 利用可能な枠の数
+        available_slots = MAX_CONCURRENT_EXPERIENCES - in_progress_count
+
+        # すぐに使える枠を追加
+        for _ in range(available_slots):
+            slot_available_times.insert(0, 0)
+
+        # 待機中の人を順番に割り当てて、最後の人の待ち時間を計算
+        if waiting_count == 0:
             estimated_wait_minutes = 0
         else:
-            # 待つ必要がある人数
-            people_waiting = waiting_count - available_slots
-            # 必要なラウンド数
-            rounds_needed = math.ceil(people_waiting / MAX_CONCURRENT_EXPERIENCES)
-            # 待ち時間
-            estimated_wait_minutes = rounds_needed * EXPERIENCE_DURATION_MINUTES
+            # 待機中の人数分のタイムラインを作成
+            timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
+
+            for i in range(waiting_count):
+                # 一番早く空く枠を使用
+                earliest_available = min(timeline)
+                # この人の待ち時間
+                wait_time = earliest_available
+                # この枠が次に空く時刻を更新
+                timeline.remove(earliest_available)
+                timeline.append(earliest_available + EXPERIENCE_DURATION_MINUTES)
+
+                # 最後の人の待ち時間を記録
+                if i == waiting_count - 1:
+                    estimated_wait_minutes = int(math.ceil(wait_time))
 
         return Stats(
             waiting_count=waiting_count,
