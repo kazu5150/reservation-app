@@ -1,13 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Stats } from '@/types/reservation';
 
 export default function Home() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState<Stats | null>(null);
   const router = useRouter();
+
+  // 統計情報を取得
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (err) {
+      console.error('統計情報の取得に失敗しました', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+
+    // 10秒ごとに自動更新
+    const interval = setInterval(fetchStats, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +70,40 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
       <div className="max-w-md w-full">
+        {/* 待ち状況表示 */}
+        {stats && (
+          <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
+              現在の待ち状況
+            </h2>
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              {/* 待機中の人数 */}
+              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-4 text-center">
+                <div className="text-yellow-800 text-sm font-semibold mb-1">待機中</div>
+                <div className="text-5xl font-bold text-yellow-900">{stats.waiting_count}</div>
+                <div className="text-yellow-700 text-xs mt-1">人</div>
+              </div>
+
+              {/* 体験中の人数 */}
+              <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-4 text-center">
+                <div className="text-green-800 text-sm font-semibold mb-1">体験中</div>
+                <div className="text-5xl font-bold text-green-900">{stats.in_progress_count}</div>
+                <div className="text-green-700 text-xs mt-1">人</div>
+              </div>
+            </div>
+
+            {/* 予想待ち時間 */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
+              <div className="text-blue-800 text-sm font-semibold mb-1">予想待ち時間</div>
+              <div className="text-5xl font-bold text-blue-900">
+                {stats.estimated_wait_minutes}
+              </div>
+              <div className="text-blue-700 text-xs mt-1">分</div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">

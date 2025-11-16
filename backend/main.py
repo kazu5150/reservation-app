@@ -55,6 +55,12 @@ class WaitInfo(BaseModel):
     estimated_wait_minutes: int  # 予想待ち時間（分）
     current_status: str
 
+class Stats(BaseModel):
+    waiting_count: int  # 待機中の人数
+    in_progress_count: int  # 体験中の人数
+    completed_count: int  # 完了した人数
+    estimated_wait_minutes: int  # 現在の予想待ち時間（分）
+
 # ルートエンドポイント
 @app.get("/")
 def read_root():
@@ -160,6 +166,35 @@ async def get_waiting_reservations():
     try:
         response = supabase.table("reservations").select("*").eq("status", "waiting").order("queue_number").execute()
         return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 統計情報取得
+@app.get("/stats", response_model=Stats)
+async def get_stats():
+    """
+    現在の待機状況の統計情報を取得
+    """
+    try:
+        # 各ステータスの件数を取得
+        waiting_response = supabase.table("reservations").select("*", count="exact").eq("status", "waiting").execute()
+        in_progress_response = supabase.table("reservations").select("*", count="exact").eq("status", "in_progress").execute()
+        completed_response = supabase.table("reservations").select("*", count="exact").eq("status", "completed").execute()
+
+        waiting_count = waiting_response.count if waiting_response.count is not None else 0
+        in_progress_count = in_progress_response.count if in_progress_response.count is not None else 0
+        completed_count = completed_response.count if completed_response.count is not None else 0
+
+        # 現在の予想待ち時間を計算（待機中 + 体験中の人数 × 体験時間）
+        total_waiting = waiting_count + in_progress_count
+        estimated_wait_minutes = total_waiting * EXPERIENCE_DURATION_MINUTES
+
+        return Stats(
+            waiting_count=waiting_count,
+            in_progress_count=in_progress_count,
+            completed_count=completed_count,
+            estimated_wait_minutes=estimated_wait_minutes
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
