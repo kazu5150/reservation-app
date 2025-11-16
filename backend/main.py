@@ -205,11 +205,11 @@ async def update_reservation_status(queue_number: int, update: ReservationUpdate
     try:
         update_data = {"status": update.status}
 
-        # ステータスに応じてタイムスタンプを更新
+        # ステータスに応じてタイムスタンプを更新（UTC で保存）
         if update.status == "in_progress":
-            update_data["started_at"] = datetime.now().isoformat()
+            update_data["started_at"] = datetime.now(timezone.utc).isoformat()
         elif update.status in ["completed", "cancelled"]:
-            update_data["completed_at"] = datetime.now().isoformat()
+            update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
 
         response = supabase.table("reservations").update(update_data).eq("queue_number", queue_number).execute()
 
