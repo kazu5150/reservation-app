@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import math
 from dotenv import load_dotenv
@@ -128,19 +128,26 @@ async def get_wait_info(queue_number: int):
         position = waiting_before_count + 1
 
         # 予想待ち時間を計算（体験開始時刻を考慮）
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
 
         # 体験中の各予約の残り時間を計算
         slot_available_times = []  # 各枠が空くまでの時間（分）
 
         for res in (in_progress_response.data or []):
             if res.get("started_at"):
-                started_at = datetime.fromisoformat(res["started_at"].replace('Z', '+00:00'))
-                # 経過時間（分）
-                elapsed_minutes = (now - started_at).total_seconds() / 60
-                # 残り時間（分）
-                remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
-                slot_available_times.append(remaining_minutes)
+                try:
+                    started_at_str = res["started_at"]
+                    if started_at_str.endswith('Z'):
+                        started_at_str = started_at_str[:-1] + '+00:00'
+                    started_at = datetime.fromisoformat(started_at_str)
+                    # 経過時間（分）
+                    elapsed_minutes = (now - started_at).total_seconds() / 60
+                    # 残り時間（分）
+                    remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
+                    slot_available_times.append(remaining_minutes)
+                except Exception:
+                    # パースエラーの場合は残り時間を最大値とする
+                    slot_available_times.append(EXPERIENCE_DURATION_MINUTES)
 
         # 残り時間でソート（早く空く順）
         slot_available_times.sort()
@@ -160,6 +167,9 @@ async def get_wait_info(queue_number: int):
         else:
             # タイムラインを作成（最初の3枠）
             timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
+            # timeline が MAX_CONCURRENT_EXPERIENCES より少ない場合は0で埋める
+            while len(timeline) < MAX_CONCURRENT_EXPERIENCES:
+                timeline.append(0)
 
             for i in range(total_people):
                 # 一番早く空く枠を使用
@@ -241,21 +251,26 @@ async def get_stats():
         completed_count = completed_response.count if completed_response.count is not None else 0
 
         # 現在の予想待ち時間を計算（体験開始時刻を考慮）
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
 
         # 体験中の各予約の残り時間を計算
-        slot_available_times = []  # 各枠が空く時刻
+        slot_available_times = []  # 各枠が空くまでの時間（分）
 
         for reservation in (in_progress_response.data or []):
             if reservation.get("started_at"):
-                started_at = datetime.fromisoformat(reservation["started_at"].replace('Z', '+00:00'))
-                # 経過時間（分）
-                elapsed_minutes = (now - started_at).total_seconds() / 60
-                # 残り時間（分）
-                remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
-                # この枠が空く時刻
-                available_at = now + (remaining_minutes * 60)  # 秒に変換
-                slot_available_times.append(remaining_minutes)
+                try:
+                    started_at_str = reservation["started_at"]
+                    if started_at_str.endswith('Z'):
+                        started_at_str = started_at_str[:-1] + '+00:00'
+                    started_at = datetime.fromisoformat(started_at_str)
+                    # 経過時間（分）
+                    elapsed_minutes = (now - started_at).total_seconds() / 60
+                    # 残り時間（分）
+                    remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
+                    slot_available_times.append(remaining_minutes)
+                except Exception:
+                    # パースエラーの場合は残り時間を最大値とする
+                    slot_available_times.append(EXPERIENCE_DURATION_MINUTES)
 
         # 残り時間でソート（早く空く順）
         slot_available_times.sort()
@@ -272,7 +287,10 @@ async def get_stats():
             estimated_wait_minutes = 0
         else:
             # 待機中の人数分のタイムラインを作成
+            # slot_available_times が MAX_CONCURRENT_EXPERIENCES より少ない場合は0で埋める
             timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
+            while len(timeline) < MAX_CONCURRENT_EXPERIENCES:
+                timeline.append(0)
 
             for i in range(waiting_count):
                 # 一番早く空く枠を使用
