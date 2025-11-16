@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 import os
+import math
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
@@ -32,6 +33,9 @@ supabase: Client = create_client(supabase_url, supabase_key)
 
 # 体験時間の設定（分）
 EXPERIENCE_DURATION_MINUTES = 10
+
+# 同時に体験できる最大人数
+MAX_CONCURRENT_EXPERIENCES = 3
 
 # データモデル
 class ReservationCreate(BaseModel):
@@ -112,13 +116,31 @@ async def get_wait_info(queue_number: int):
 
         reservation = reservation_response.data[0]
 
-        # 自分より前の待ち人数を計算
-        waiting_before = supabase.table("reservations").select("*", count="exact").lt("queue_number", queue_number).in_("status", ["waiting", "in_progress"]).execute()
+        # 自分より前の待機中の人数を計算
+        waiting_before = supabase.table("reservations").select("*", count="exact").lt("queue_number", queue_number).eq("status", "waiting").execute()
+        waiting_before_count = waiting_before.count if waiting_before.count is not None else 0
 
-        position = waiting_before.count + 1 if waiting_before.count is not None else 1
+        # 現在体験中の人数を取得
+        in_progress_response = supabase.table("reservations").select("*", count="exact").eq("status", "in_progress").execute()
+        in_progress_count = in_progress_response.count if in_progress_response.count is not None else 0
 
-        # 予想待ち時間を計算（前の人数 × 体験時間）
-        estimated_wait_minutes = max(0, (position - 1) * EXPERIENCE_DURATION_MINUTES)
+        # 自分の順位（待機中の中での順位）
+        position = waiting_before_count + 1
+
+        # 予想待ち時間を計算（同時に3人まで体験可能）
+        # 利用可能な枠
+        available_slots = max(0, MAX_CONCURRENT_EXPERIENCES - in_progress_count)
+
+        if waiting_before_count < available_slots:
+            # すぐに始められる
+            estimated_wait_minutes = 0
+        else:
+            # 待つ必要がある人数
+            people_waiting = waiting_before_count - available_slots + 1  # 自分を含む
+            # 必要なラウンド数
+            rounds_needed = math.ceil(people_waiting / MAX_CONCURRENT_EXPERIENCES)
+            # 待ち時間
+            estimated_wait_minutes = rounds_needed * EXPERIENCE_DURATION_MINUTES
 
         return WaitInfo(
             queue_number=queue_number,
@@ -185,9 +207,20 @@ async def get_stats():
         in_progress_count = in_progress_response.count if in_progress_response.count is not None else 0
         completed_count = completed_response.count if completed_response.count is not None else 0
 
-        # 現在の予想待ち時間を計算（待機中 + 体験中の人数 × 体験時間）
-        total_waiting = waiting_count + in_progress_count
-        estimated_wait_minutes = total_waiting * EXPERIENCE_DURATION_MINUTES
+        # 現在の予想待ち時間を計算（同時に3人まで体験可能）
+        # 利用可能な枠
+        available_slots = max(0, MAX_CONCURRENT_EXPERIENCES - in_progress_count)
+
+        if waiting_count <= available_slots:
+            # 全員すぐに始められる
+            estimated_wait_minutes = 0
+        else:
+            # 待つ必要がある人数
+            people_waiting = waiting_count - available_slots
+            # 必要なラウンド数
+            rounds_needed = math.ceil(people_waiting / MAX_CONCURRENT_EXPERIENCES)
+            # 待ち時間
+            estimated_wait_minutes = rounds_needed * EXPERIENCE_DURATION_MINUTES
 
         return Stats(
             waiting_count=waiting_count,
