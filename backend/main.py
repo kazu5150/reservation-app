@@ -203,6 +203,19 @@ async def update_reservation_status(queue_number: int, update: ReservationUpdate
     予約のステータスを更新（管理者画面用）
     """
     try:
+        # ステータスを "in_progress" に変更する場合、同時体験人数の上限をチェック
+        if update.status == "in_progress":
+            # 現在体験中の人数を取得
+            in_progress_response = supabase.table("reservations").select("*", count="exact").eq("status", "in_progress").execute()
+            current_in_progress = in_progress_response.count if in_progress_response.count is not None else 0
+
+            # 上限チェック
+            if current_in_progress >= MAX_CONCURRENT_EXPERIENCES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"同時に体験できる人数は{MAX_CONCURRENT_EXPERIENCES}人までです。現在{current_in_progress}人が体験中です。"
+                )
+
         update_data = {"status": update.status}
 
         # ステータスに応じてタイムスタンプを更新（UTC で保存）
