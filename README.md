@@ -22,19 +22,19 @@
 ## スクリーンショット
 
 ### 受付フォーム
-ユーザーは名前を入力して体験会に申し込みます。
+ユーザーは名前を入力して体験会に申し込みます。トップページには待ち状況と各席の状況がプログレスバーで表示されます。
 
-![受付フォーム](screenshots/registration-form.png)
+<img src="screenshots/registration-form.png" alt="受付フォーム" width="600">
 
 ### 待ち状況画面
 受付完了後、ユーザーは自分の待ち番号と予想待ち時間を確認できます。
 
-![待ち状況画面](screenshots/wait-screen.png)
+<img src="screenshots/wait-screen.png" alt="待ち状況画面" width="400">
 
 ### 管理画面
 スタッフは全予約の状況を確認し、ステータスを管理できます。
 
-![管理画面](screenshots/admin-screen.png)
+<img src="screenshots/admin-screen.png" alt="管理画面" width="800">
 
 ## 技術スタック
 
