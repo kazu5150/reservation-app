@@ -64,12 +64,18 @@ class Seat(BaseModel):
     name: str  # 利用者名
     remaining_minutes: float  # 残り時間（分）
 
+class OvertimeSeat(BaseModel):
+    seat_name: str  # 席名（A席、B席、C席）
+    name: str  # 利用者名
+    overtime_minutes: float  # 超過時間（分）
+
 class Stats(BaseModel):
     waiting_count: int  # 待機中の人数
     in_progress_count: int  # 体験中の人数
     completed_count: int  # 完了した人数
     estimated_wait_minutes: int  # 現在の予想待ち時間（分）
     seats: List[Seat]  # 各席の情報
+    overtime_seats: List[OvertimeSeat]  # 超過している席の情報
 
 # ルートエンドポイント
 @app.get("/")
@@ -275,10 +281,12 @@ async def get_stats():
         # 体験中の各予約の残り時間を計算
         slot_available_times = []  # 各枠が空くまでの時間（分）
         seats_info = []  # 各席の情報
+        overtime_seats_info = []  # 超過している席の情報
         seat_names = ["A席", "B席", "C席"]
 
         for idx, reservation in enumerate(in_progress_response.data or []):
             remaining_minutes = EXPERIENCE_DURATION_MINUTES
+            elapsed_minutes = 0
             if reservation.get("started_at"):
                 try:
                     started_at_str = reservation["started_at"]
@@ -297,11 +305,20 @@ async def get_stats():
 
             # 席の情報を追加
             if idx < len(seat_names):
-                seats_info.append(Seat(
-                    seat_name=seat_names[idx],
-                    name=reservation.get("name", "Unknown"),
-                    remaining_minutes=round(remaining_minutes, 1)
-                ))
+                # 10分を超過しているかチェック
+                if elapsed_minutes > EXPERIENCE_DURATION_MINUTES:
+                    overtime_minutes = elapsed_minutes - EXPERIENCE_DURATION_MINUTES
+                    overtime_seats_info.append(OvertimeSeat(
+                        seat_name=seat_names[idx],
+                        name=reservation.get("name", "Unknown"),
+                        overtime_minutes=round(overtime_minutes, 1)
+                    ))
+                else:
+                    seats_info.append(Seat(
+                        seat_name=seat_names[idx],
+                        name=reservation.get("name", "Unknown"),
+                        remaining_minutes=round(remaining_minutes, 1)
+                    ))
 
         # 残り時間でソート（早く空く順）
         slot_available_times.sort()
@@ -343,7 +360,8 @@ async def get_stats():
             in_progress_count=in_progress_count,
             completed_count=completed_count,
             estimated_wait_minutes=estimated_wait_minutes,
-            seats=seats_info
+            seats=seats_info,
+            overtime_seats=overtime_seats_info
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -77,6 +77,36 @@ export default function Home() {
               現在の待ち状況
             </h2>
 
+            {/* 体験時間超過の警告 */}
+            {stats.overtime_seats && stats.overtime_seats.length > 0 && (
+              <div className="bg-gradient-to-r from-red-100 to-orange-100 border-2 border-red-400 rounded-xl p-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-red-800 font-bold text-sm">体験時間超過</span>
+                </div>
+                <div className="space-y-2">
+                  {stats.overtime_seats.map((seat) => (
+                    <div key={seat.seat_name} className="bg-white bg-opacity-60 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-gray-900">{seat.seat_name}</span>
+                          <span className="text-sm text-gray-700">{seat.name}様</span>
+                        </div>
+                        <span className="text-sm font-bold text-red-600">
+                          {Math.ceil(seat.overtime_minutes)}分超過
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 text-xs text-red-700">
+                  スタッフにお声がけください
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4 mb-4">
               {/* 待機中の人数 */}
               <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-4 text-center">
