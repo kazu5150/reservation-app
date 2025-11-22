@@ -190,85 +190,85 @@ export default function Home() {
 
               {/* 体験時間超過の警告 */}
               {stats.overtime_seats && stats.overtime_seats.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-6 mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span className="text-red-800 font-semibold text-sm">体験時間超過</span>
+                  <span className="text-red-800 font-bold text-lg">体験時間超過</span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {stats.overtime_seats.map((seat) => (
-                    <div key={seat.seat_name} className="bg-white bg-opacity-60 rounded-lg p-3">
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-slate-900">{seat.seat_name}</span>
-                          <span className="text-sm text-slate-700">{seat.name}様</span>
+                    <div key={seat.seat_name} className="bg-white bg-opacity-60 rounded-xl p-5">
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl font-bold text-slate-900">{seat.seat_name}</span>
+                          <span className="text-lg text-slate-700">{seat.name}様</span>
                         </div>
-                        <span className="text-sm font-bold text-red-600">
+                        <span className="text-lg font-bold text-red-600">
                           {Math.ceil(seat.overtime_minutes)}分超過
                         </span>
                       </div>
                       <button
                         onClick={() => updateStatus(seat.queue_number, 'completed')}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded text-xs transition"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-lg transition shadow-sm"
                       >
                         完了
                       </button>
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 text-xs text-red-700">
+                <div className="mt-4 text-sm text-red-700 font-medium">
                   スタッフにお声がけください
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               {/* 待機中の人数 */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-                <div className="text-amber-700 text-xs font-medium mb-2">待機中</div>
-                <div className="text-4xl font-bold text-amber-900">{stats.waiting_count}</div>
-                <div className="text-amber-600 text-xs mt-1">人</div>
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center">
+                <div className="text-amber-700 text-base font-semibold mb-3">待機中</div>
+                <div className="text-6xl font-bold text-amber-900">{stats.waiting_count}</div>
+                <div className="text-amber-600 text-base mt-2">人</div>
               </div>
 
               {/* 体験中の人数 */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
-                <div className="text-emerald-700 text-xs font-medium mb-2">体験中</div>
-                <div className="text-4xl font-bold text-emerald-900">{stats.in_progress_count}</div>
-                <div className="text-emerald-600 text-xs mt-1">人</div>
+              <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
+                <div className="text-emerald-700 text-base font-semibold mb-3">体験中</div>
+                <div className="text-6xl font-bold text-emerald-900">{stats.in_progress_count}</div>
+                <div className="text-emerald-600 text-base mt-2">人</div>
               </div>
             </div>
 
             {/* 予想待ち時間 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center mb-4">
-              <div className="text-blue-700 text-xs font-medium mb-2">予想待ち時間</div>
-              <div className="text-4xl font-bold text-blue-900">
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center mb-6">
+              <div className="text-blue-700 text-base font-semibold mb-3">予想待ち時間</div>
+              <div className="text-6xl font-bold text-blue-900">
                 {stats.estimated_wait_minutes}
               </div>
-              <div className="text-blue-600 text-xs mt-1">分</div>
+              <div className="text-blue-600 text-base mt-2">分</div>
             </div>
 
             {/* 席の状況 */}
             {stats.seats && stats.seats.length > 0 && (
-              <div className="space-y-3 mb-4">
-                <h3 className="text-sm font-semibold text-slate-700 mb-3">各席の状況</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
+              <div className="space-y-4 mb-6">
+                <h3 className="text-lg font-bold text-slate-700 mb-4">各席の状況</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
                   {stats.seats.map((seat) => {
                     const progress = (seat.remaining_minutes / 10) * 100;
                     return (
-                      <div key={seat.seat_name} className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-slate-900">{seat.seat_name}</span>
-                            <span className="text-sm text-slate-600">{seat.name}様</span>
+                      <div key={seat.seat_name} className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
+                        <div className="flex justify-between items-center mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl font-bold text-slate-900">{seat.seat_name}</span>
+                            <span className="text-lg text-slate-600">{seat.name}様</span>
                           </div>
-                          <span className="text-xs font-medium text-blue-600">
+                          <span className="text-base font-bold text-blue-600">
                             残り {Math.ceil(seat.remaining_minutes)}分
                           </span>
                         </div>
                         {/* プログレスバー */}
-                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden mb-2">
+                        <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden mb-3">
                           <div
                             className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-500"
                             style={{ width: `${progress}%` }}
@@ -277,7 +277,7 @@ export default function Home() {
                         {/* 完了ボタン */}
                         <button
                           onClick={() => updateStatus(seat.queue_number, 'completed')}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded text-xs transition"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-lg transition shadow-sm"
                         >
                           完了
                         </button>
@@ -290,26 +290,26 @@ export default function Home() {
 
             {/* 待機者リスト */}
             {waitingList.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-slate-700 mb-3">待機中の方</h3>
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-slate-700 mb-4">待機中の方</h3>
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     {waitingList.map((reservation) => (
                       <div
                         key={reservation.queue_number}
-                        className="bg-white rounded border border-amber-200 p-2"
+                        className="bg-white rounded-lg border-2 border-amber-200 p-4"
                       >
-                        <div className="text-center mb-2">
-                          <div className="text-xl font-bold text-amber-600">
+                        <div className="text-center mb-3">
+                          <div className="text-3xl font-bold text-amber-600">
                             {reservation.queue_number}
                           </div>
-                          <div className="text-xs text-slate-600">
+                          <div className="text-base text-slate-600">
                             {reservation.name}様
                           </div>
                         </div>
                         <button
                           onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-1 px-2 rounded text-xs transition"
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg text-lg transition shadow-sm"
                         >
                           開始
                         </button>
@@ -325,17 +325,17 @@ export default function Home() {
           {/* 右側: 受付フォーム */}
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-slate-900 mb-3">
               プログラミング体験会
             </h1>
-            <p className="text-slate-600 text-sm">
+            <p className="text-slate-600 text-lg">
               受付フォーム
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="name" className="block text-lg font-semibold text-slate-700 mb-3">
                 お名前
               </label>
               <input
@@ -343,14 +343,14 @@ export default function Home() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                className="w-full px-5 py-4 border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400 text-lg"
                 placeholder="山田 太郎"
                 disabled={loading}
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg text-red-700 text-base font-medium">
                 {error}
               </div>
             )}
@@ -358,17 +358,17 @@ export default function Home() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition disabled:bg-slate-400 disabled:cursor-not-allowed shadow-sm"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition disabled:bg-slate-400 disabled:cursor-not-allowed shadow-sm text-xl"
             >
               {loading ? '処理中...' : '受付する'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-200">
-            <div className="flex justify-center gap-4 text-sm">
+            <div className="flex justify-center gap-4">
               <a
                 href="/admin"
-                className="text-blue-600 hover:text-blue-700 hover:underline transition"
+                className="text-blue-600 hover:text-blue-700 hover:underline transition text-lg font-semibold"
               >
                 管理画面
               </a>
@@ -378,25 +378,25 @@ export default function Home() {
         </div>
 
         {/* ご案内セクション（下部に全幅で表示） */}
-        <div className="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
-          <h2 className="font-semibold text-slate-900 mb-3 text-sm">
+        <div className="mt-6 bg-slate-50 border-2 border-slate-200 rounded-xl p-6">
+          <h2 className="font-bold text-slate-900 mb-4 text-lg">
             ご案内
           </h2>
-          <ul className="text-sm text-slate-600 space-y-2">
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+          <ul className="text-base text-slate-600 space-y-3">
+            <li className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span>体験時間: 約10分</span>
             </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <li className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span>受付後、待ち番号をお伝えします</span>
             </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+            <li className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span>待ち時間の目安を確認できます</span>

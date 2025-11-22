@@ -125,45 +125,45 @@ export default function AdminPage() {
         {/* ヘッダー */}
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-3xl font-bold text-slate-900">
               管理画面
             </h1>
             <button
               onClick={() => router.push('/')}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-sm text-lg"
             >
               トップページ
             </button>
           </div>
 
           {/* 統計情報 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-              <div className="text-amber-700 text-xs font-medium mb-2">待機中</div>
-              <div className="text-4xl font-bold text-amber-900">{waitingCount}</div>
-              <div className="text-amber-600 text-xs mt-1">人</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center">
+              <div className="text-amber-700 text-base font-semibold mb-3">待機中</div>
+              <div className="text-6xl font-bold text-amber-900">{waitingCount}</div>
+              <div className="text-amber-600 text-base mt-2">人</div>
             </div>
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
-              <div className="text-emerald-700 text-xs font-medium mb-2">体験中</div>
-              <div className="text-4xl font-bold text-emerald-900">{inProgressCount}</div>
-              <div className="text-emerald-600 text-xs mt-1">人</div>
+            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
+              <div className="text-emerald-700 text-base font-semibold mb-3">体験中</div>
+              <div className="text-6xl font-bold text-emerald-900">{inProgressCount}</div>
+              <div className="text-emerald-600 text-base mt-2">人</div>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-              <div className="text-blue-700 text-xs font-medium mb-2">完了</div>
-              <div className="text-4xl font-bold text-blue-900">{completedCount}</div>
-              <div className="text-blue-600 text-xs mt-1">人</div>
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+              <div className="text-blue-700 text-base font-semibold mb-3">完了</div>
+              <div className="text-6xl font-bold text-blue-900">{completedCount}</div>
+              <div className="text-blue-600 text-base mt-2">人</div>
             </div>
           </div>
         </div>
 
         {/* 次の案内対象者 */}
         {availableSeats > 0 && nextToCall.length > 0 && (
-          <div className="bg-orange-50 rounded-lg shadow-sm border border-orange-200 p-6 mb-6">
+          <div className="bg-orange-50 rounded-xl shadow-sm border-2 border-orange-200 p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-semibold text-slate-900">
+              <h2 className="text-2xl font-bold text-slate-900">
                 次の案内
               </h2>
-              <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+              <span className="bg-orange-500 text-white px-3 py-2 rounded-full text-base font-bold">
                 {availableSeats}席空き
               </span>
             </div>
@@ -172,25 +172,25 @@ export default function AdminPage() {
               {nextToCall.map((reservation) => (
                 <div
                   key={reservation.id}
-                  className="bg-white rounded-lg p-4 border-2 border-orange-300 shadow-sm"
+                  className="bg-white rounded-xl p-5 border-2 border-orange-300 shadow-sm"
                 >
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <div className="text-3xl font-bold text-orange-600 mb-1">
+                      <div className="text-4xl font-bold text-orange-600 mb-2">
                         {reservation.queue_number}
                       </div>
-                      <div className="text-base font-semibold text-slate-900">
+                      <div className="text-xl font-bold text-slate-900">
                         {reservation.name}様
                       </div>
                     </div>
-                    <div className="bg-amber-100 px-2 py-1 rounded text-xs font-medium text-amber-800 border border-amber-200">
+                    <div className="bg-amber-100 px-3 py-2 rounded text-base font-bold text-amber-800 border-2 border-amber-200">
                       待機中
                     </div>
                   </div>
 
                   <button
                     onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-sm text-lg"
                   >
                     案内開始
                   </button>
@@ -202,43 +202,43 @@ export default function AdminPage() {
 
         {/* 待機中の方一覧 */}
         {waitingReservations.length > 0 && (
-          <div className="bg-amber-50 rounded-lg shadow-sm border border-amber-200 p-6 mb-6">
+          <div className="bg-amber-50 rounded-xl shadow-sm border-2 border-amber-200 p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-semibold text-slate-900">
+              <h2 className="text-2xl font-bold text-slate-900">
                 待機中の方
               </h2>
-              <span className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+              <span className="bg-amber-500 text-white px-3 py-2 rounded-full text-base font-bold">
                 {waitingReservations.length}人
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {waitingReservations.map((reservation, index) => (
                 <div
                   key={reservation.id}
-                  className={`bg-white rounded-lg p-3 border shadow-sm ${
+                  className={`bg-white rounded-xl p-4 border-2 shadow-sm ${
                     index < availableSeats
                       ? 'border-orange-300 bg-orange-50'
                       : 'border-amber-200'
                   }`}
                 >
                   <div className="text-center">
-                    <div className={`text-2xl font-bold mb-1 ${
+                    <div className={`text-3xl font-bold mb-2 ${
                       index < availableSeats ? 'text-orange-600' : 'text-amber-600'
                     }`}>
                       {reservation.queue_number}
                     </div>
-                    <div className="text-sm font-semibold text-slate-900">
+                    <div className="text-base font-bold text-slate-900">
                       {reservation.name}様
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">
+                    <div className="text-sm text-slate-500 mt-2">
                       {new Date(reservation.created_at).toLocaleTimeString('ja-JP', {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
                     </div>
                     {index < availableSeats && (
-                      <div className="mt-2 text-xs font-semibold text-orange-600">
+                      <div className="mt-2 text-sm font-bold text-orange-600">
                         次の案内
                       </div>
                     )}
@@ -251,24 +251,24 @@ export default function AdminPage() {
 
         {/* エラー表示 */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6 text-red-700 text-sm">
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-red-700 text-base font-medium">
             {error}
           </div>
         )}
 
         {/* 予約一覧 */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden border-2 border-slate-200">
           <div className="p-6 border-b border-slate-200">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900">予約一覧</h2>
+              <h2 className="text-2xl font-bold text-slate-900">予約一覧</h2>
               <button
                 onClick={fetchReservations}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition text-sm shadow-sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg transition text-base shadow-sm"
               >
                 更新
               </button>
             </div>
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-sm text-slate-500 mt-2">
               10秒ごとに自動更新されます
             </p>
           </div>
@@ -277,19 +277,19 @@ export default function AdminPage() {
             <table className="w-full">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-600 uppercase tracking-wider">
                     番号
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-600 uppercase tracking-wider">
                     名前
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-600 uppercase tracking-wider">
                     ステータス
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-600 uppercase tracking-wider">
                     受付時刻
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-600 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
@@ -297,37 +297,37 @@ export default function AdminPage() {
               <tbody className="bg-white divide-y divide-slate-200">
                 {reservations.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                    <td colSpan={5} className="px-6 py-10 text-center text-slate-500 text-lg">
                       予約がありません
                     </td>
                   </tr>
                 ) : (
                   reservations.map((reservation) => (
                     <tr key={reservation.id} className="hover:bg-slate-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-xl font-bold text-slate-900">
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="text-2xl font-bold text-slate-900">
                           {reservation.queue_number}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-slate-900">
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="text-lg font-semibold text-slate-900">
                           {reservation.name}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded border ${getStatusBadgeColor(reservation.status)}`}>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <span className={`px-3 py-2 inline-flex text-sm leading-5 font-bold rounded border-2 ${getStatusBadgeColor(reservation.status)}`}>
                           {getStatusText(reservation.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      <td className="px-6 py-5 whitespace-nowrap text-base text-slate-500">
                         {new Date(reservation.created_at).toLocaleString('ja-JP')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-6 py-5 whitespace-nowrap text-base font-medium">
                         <div className="flex flex-wrap gap-2">
                           {reservation.status === 'waiting' && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg transition font-semibold text-xs"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition font-bold text-sm"
                             >
                               開始
                             </button>
@@ -335,7 +335,7 @@ export default function AdminPage() {
                           {reservation.status === 'in_progress' && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'completed')}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition font-semibold text-xs"
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-bold text-sm"
                             >
                               完了
                             </button>
@@ -343,7 +343,7 @@ export default function AdminPage() {
                           {(reservation.status === 'waiting' || reservation.status === 'in_progress') && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'cancelled')}
-                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition font-semibold text-xs"
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition font-bold text-sm"
                             >
                               キャンセル
                             </button>
