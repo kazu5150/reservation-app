@@ -15,7 +15,34 @@ export default function Home() {
   const [error, setError] = useState('');
   const [stats, setStats] = useState<Stats | null>(null);
   const [waitingList, setWaitingList] = useState<WaitingReservation[]>([]);
+  const [alertedSeats, setAlertedSeats] = useState<Set<number>>(new Set());
   const router = useRouter();
+
+  // アラート音を鳴らす関数
+  const playAlertSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // 音の設定
+      oscillator.frequency.value = 800; // 周波数（Hz）
+      oscillator.type = 'sine'; // 波形
+
+      // 音量の設定（フェードアウト）
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+      // 再生
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (err) {
+      console.error('アラート音の再生に失敗しました', err);
+    }
+  };
 
   // 統計情報を取得
   const fetchStats = async () => {
@@ -55,6 +82,39 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // 残り時間が0になった席を検知してアラートを鳴らす
+  useEffect(() => {
+    if (!stats?.seats) return;
+
+    // 残り時間が0以下の席を検出
+    const seatsWithZeroTime = stats.seats.filter(
+      (seat) => seat.remaining_minutes <= 0
+    );
+
+    // 新しくアラートが必要な席をチェック
+    seatsWithZeroTime.forEach((seat) => {
+      if (!alertedSeats.has(seat.queue_number)) {
+        // まだアラートを鳴らしていない席
+        playAlertSound();
+        setAlertedSeats((prev) => new Set(prev).add(seat.queue_number));
+      }
+    });
+
+    // 完了した席や超過した席のアラート状態をクリア
+    const currentQueueNumbers = new Set(
+      stats.seats.map((seat) => seat.queue_number)
+    );
+    setAlertedSeats((prev) => {
+      const newSet = new Set<number>();
+      prev.forEach((qn) => {
+        if (currentQueueNumbers.has(qn)) {
+          newSet.add(qn);
+        }
+      });
+      return newSet;
+    });
+  }, [stats?.seats]);
 
   // ステータス更新
   const updateStatus = async (queueNumber: number, newStatus: string) => {
