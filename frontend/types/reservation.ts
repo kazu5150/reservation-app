@@ -30,6 +30,7 @@ export interface OvertimeSeat {
   seat_name: string;
   name: string;
   overtime_minutes: number;
+  queue_number: number;
 }
 
 export interface Stats {

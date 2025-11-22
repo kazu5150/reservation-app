@@ -70,6 +70,7 @@ class OvertimeSeat(BaseModel):
     seat_name: str  # 席名（A席、B席、C席）
     name: str  # 利用者名
     overtime_minutes: float  # 超過時間（分）
+    queue_number: int  # 予約番号
 
 class Stats(BaseModel):
     waiting_count: int  # 待機中の人数
@@ -378,7 +379,8 @@ async def get_stats():
                     overtime_seats_info.append(OvertimeSeat(
                         seat_name=seat_names[idx],
                         name=reservation.get("name", "Unknown"),
-                        overtime_minutes=round(overtime_minutes, 1)
+                        overtime_minutes=round(overtime_minutes, 1),
+                        queue_number=reservation.get("queue_number", 0)
                     ))
                 else:
                     seats_info.append(Seat(

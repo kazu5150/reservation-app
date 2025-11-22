@@ -140,15 +140,21 @@ export default function Home() {
                 <div className="space-y-2">
                   {stats.overtime_seats.map((seat) => (
                     <div key={seat.seat_name} className="bg-white bg-opacity-60 rounded-lg p-3">
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-gray-900">{seat.seat_name}</span>
-                          <span className="text-sm text-gray-700">{seat.name}様</span>
+                          <span className="text-sm font-bold text-slate-900">{seat.seat_name}</span>
+                          <span className="text-sm text-slate-700">{seat.name}様</span>
                         </div>
                         <span className="text-sm font-bold text-red-600">
                           {Math.ceil(seat.overtime_minutes)}分超過
                         </span>
                       </div>
+                      <button
+                        onClick={() => updateStatus(seat.queue_number, 'completed')}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded text-xs transition"
+                      >
+                        完了
+                      </button>
                     </div>
                   ))}
                 </div>
