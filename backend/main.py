@@ -5,6 +5,7 @@ from typing import Optional, List
 from datetime import datetime, timezone
 import os
 import math
+import asyncio
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
@@ -76,6 +77,71 @@ class Stats(BaseModel):
     estimated_wait_minutes: int  # 現在の予想待ち時間（分）
     seats: List[Seat]  # 各席の情報
     overtime_seats: List[OvertimeSeat]  # 超過している席の情報
+
+# バックグラウンドタスク用の変数
+background_task: Optional[asyncio.Task] = None
+
+# 自動完了チェック関数
+async def auto_complete_expired_sessions():
+    """
+    定期的に体験中のセッションをチェックし、
+    10分経過したものを自動的に完了にする
+    """
+    while True:
+        try:
+            # 体験中の予約を取得
+            in_progress_response = supabase.table("reservations").select("*").eq("status", "in_progress").execute()
+
+            if in_progress_response.data:
+                now = datetime.now(timezone.utc)
+
+                for reservation in in_progress_response.data:
+                    if reservation.get("started_at"):
+                        try:
+                            started_at_str = reservation["started_at"]
+                            if started_at_str.endswith('Z'):
+                                started_at_str = started_at_str[:-1] + '+00:00'
+                            started_at = datetime.fromisoformat(started_at_str)
+
+                            # 経過時間（分）を計算
+                            elapsed_minutes = (now - started_at).total_seconds() / 60
+
+                            # 10分以上経過していたら自動完了
+                            if elapsed_minutes >= EXPERIENCE_DURATION_MINUTES:
+                                supabase.table("reservations").update({
+                                    "status": "completed",
+                                    "completed_at": now.isoformat()
+                                }).eq("queue_number", reservation["queue_number"]).execute()
+
+                                print(f"自動完了: 予約番号 {reservation['queue_number']} ({reservation['name']}様) - 経過時間: {elapsed_minutes:.1f}分")
+                        except Exception as e:
+                            print(f"予約番号 {reservation.get('queue_number')} の処理中にエラー: {e}")
+
+            # 30秒ごとにチェック
+            await asyncio.sleep(30)
+
+        except Exception as e:
+            print(f"自動完了チェック中にエラー: {e}")
+            await asyncio.sleep(30)
+
+# 起動時にバックグラウンドタスクを開始
+@app.on_event("startup")
+async def startup_event():
+    global background_task
+    background_task = asyncio.create_task(auto_complete_expired_sessions())
+    print("自動完了バックグラウンドタスクを開始しました")
+
+# シャットダウン時にバックグラウンドタスクを停止
+@app.on_event("shutdown")
+async def shutdown_event():
+    global background_task
+    if background_task:
+        background_task.cancel()
+        try:
+            await background_task
+        except asyncio.CancelledError:
+            pass
+        print("自動完了バックグラウンドタスクを停止しました")
 
 # ルートエンドポイント
 @app.get("/")
