@@ -99,6 +99,18 @@ export default function AdminPage() {
   const inProgressCount = reservations.filter((r) => r.status === 'in_progress').length;
   const completedCount = reservations.filter((r) => r.status === 'completed').length;
 
+  // 次の案内対象者を取得（待機中の予約を番号順にソート）
+  const waitingReservations = reservations
+    .filter((r) => r.status === 'waiting')
+    .sort((a, b) => a.queue_number - b.queue_number);
+
+  // 空いている席の数を計算
+  const MAX_CONCURRENT = 3;
+  const availableSeats = MAX_CONCURRENT - inProgressCount;
+
+  // 次に案内すべき予約（空いている席の数だけ）
+  const nextToCall = waitingReservations.slice(0, Math.max(0, availableSeats));
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 flex items-center justify-center relative overflow-hidden">
@@ -150,6 +162,51 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
+
+        {/* 次の案内対象者 */}
+        {availableSeats > 0 && nextToCall.length > 0 && (
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl shadow-md p-6 mb-6 border-4 border-orange-400">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-3xl">📢</div>
+              <h2 className="text-2xl font-bold text-gray-900 minecraft-text">
+                次の案内
+              </h2>
+              <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                {availableSeats}席空き
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {nextToCall.map((reservation) => (
+                <div
+                  key={reservation.id}
+                  className="bg-white rounded-lg p-4 border-4 border-orange-300 shadow-lg transform hover:scale-105 transition"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="text-4xl font-bold text-orange-600 mb-1">
+                        {reservation.queue_number}
+                      </div>
+                      <div className="text-lg font-bold text-gray-900">
+                        {reservation.name}様
+                      </div>
+                    </div>
+                    <div className="bg-yellow-100 px-2 py-1 rounded text-xs font-semibold text-yellow-800">
+                      待機中
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition border-4 border-orange-700 transform hover:scale-105 minecraft-text"
+                  >
+                    ▶️ 案内開始
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* エラー表示 */}
         {error && (
