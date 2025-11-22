@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Reservation } from '@/types/reservation';
+import {
+  MinecraftPickaxe,
+  MinecraftDiamond,
+  FloatingBlocks
+} from '@/components/MinecraftDecorations';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -96,29 +101,36 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">読み込み中...</p>
+      <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 flex items-center justify-center relative overflow-hidden">
+        <FloatingBlocks />
+        <div className="text-center relative z-10">
+          <div className="animate-pixel-pulse mb-4">
+            <MinecraftPickaxe className="mx-auto" />
+          </div>
+          <p className="mt-4 text-gray-900 font-bold minecraft-text">読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 py-8 px-4 relative overflow-hidden">
+      <FloatingBlocks />
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* ヘッダー */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6 border-4 border-green-600">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">
-              管理画面
-            </h1>
+            <div className="flex items-center gap-3">
+              <MinecraftPickaxe className="w-12 h-12" />
+              <h1 className="text-3xl font-bold text-gray-900 minecraft-text">
+                ⚙️ 管理画面
+              </h1>
+            </div>
             <button
               onClick={() => router.push('/')}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition border-4 border-green-800 minecraft-text transform hover:scale-105"
             >
-              トップページ
+              🏠 トップページ
             </button>
           </div>
 
@@ -147,15 +159,18 @@ export default function AdminPage() {
         )}
 
         {/* 予約一覧 */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden border-4 border-blue-600">
           <div className="p-6 border-b border-gray-200">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">予約一覧</h2>
+              <div className="flex items-center gap-2">
+                <MinecraftDiamond className="w-8 h-8" />
+                <h2 className="text-xl font-bold text-gray-900 minecraft-text">📋 予約一覧</h2>
+              </div>
               <button
                 onClick={fetchReservations}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition text-sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm border-4 border-blue-800 minecraft-text transform hover:scale-105"
               >
-                更新
+                🔄 更新
               </button>
             </div>
             <p className="text-sm text-gray-500 mt-1">
@@ -213,29 +228,29 @@ export default function AdminPage() {
                         {new Date(reservation.created_at).toLocaleString('ja-JP')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           {reservation.status === 'waiting' && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
-                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition"
+                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded transition border-2 border-green-800 font-bold transform hover:scale-105 text-xs sm:text-sm"
                             >
-                              開始
+                              ▶️ 開始
                             </button>
                           )}
                           {reservation.status === 'in_progress' && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'completed')}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded transition border-2 border-blue-800 font-bold transform hover:scale-105 text-xs sm:text-sm"
                             >
-                              完了
+                              ✅ 完了
                             </button>
                           )}
                           {(reservation.status === 'waiting' || reservation.status === 'in_progress') && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'cancelled')}
-                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition"
+                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded transition border-2 border-red-800 font-bold transform hover:scale-105 text-xs sm:text-sm"
                             >
-                              キャンセル
+                              ❌
                             </button>
                           )}
                         </div>
