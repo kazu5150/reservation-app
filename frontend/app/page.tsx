@@ -11,11 +11,17 @@ import {
   FloatingBlocks
 } from '@/components/MinecraftDecorations';
 
+interface WaitingReservation {
+  queue_number: number;
+  name: string;
+}
+
 export default function Home() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<Stats | null>(null);
+  const [waitingList, setWaitingList] = useState<WaitingReservation[]>([]);
   const router = useRouter();
 
   // 統計情報を取得
@@ -31,11 +37,28 @@ export default function Home() {
     }
   };
 
+  // 待機中のリストを取得
+  const fetchWaitingList = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservations/waiting/list`);
+      if (response.ok) {
+        const data = await response.json();
+        setWaitingList(data);
+      }
+    } catch (err) {
+      console.error('待機リストの取得に失敗しました', err);
+    }
+  };
+
   useEffect(() => {
     fetchStats();
+    fetchWaitingList();
 
     // 10秒ごとに自動更新
-    const interval = setInterval(fetchStats, 10000);
+    const interval = setInterval(() => {
+      fetchStats();
+      fetchWaitingList();
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -155,7 +178,7 @@ export default function Home() {
 
             {/* 席の状況 */}
             {stats.seats && stats.seats.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-3 mb-4">
                 <h3 className="text-sm font-bold text-gray-900 mb-2">各席の状況</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
                   {stats.seats.map((seat) => {
@@ -181,6 +204,30 @@ export default function Home() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* 待機者リスト */}
+            {waitingList.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">待機中の方</h3>
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+                    {waitingList.map((reservation) => (
+                      <div
+                        key={reservation.queue_number}
+                        className="bg-white rounded-lg p-2 border border-yellow-200 text-center"
+                      >
+                        <div className="text-2xl font-bold text-yellow-600">
+                          {reservation.queue_number}
+                        </div>
+                        <div className="text-xs text-gray-700">
+                          {reservation.name}様
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
