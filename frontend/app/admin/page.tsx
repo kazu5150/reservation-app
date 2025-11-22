@@ -208,6 +208,56 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* 待機中の方一覧 */}
+        {waitingReservations.length > 0 && (
+          <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl shadow-md p-6 mb-6 border-4 border-yellow-400">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-3xl">⏳</div>
+              <h2 className="text-2xl font-bold text-gray-900 minecraft-text">
+                待機中の方
+              </h2>
+              <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                {waitingReservations.length}人
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+              {waitingReservations.map((reservation, index) => (
+                <div
+                  key={reservation.id}
+                  className={`bg-white rounded-lg p-3 border-2 shadow ${
+                    index < availableSeats
+                      ? 'border-orange-400 bg-orange-50'
+                      : 'border-yellow-300'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className={`text-3xl font-bold mb-1 ${
+                      index < availableSeats ? 'text-orange-600' : 'text-yellow-600'
+                    }`}>
+                      {reservation.queue_number}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {reservation.name}様
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {new Date(reservation.created_at).toLocaleTimeString('ja-JP', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                    {index < availableSeats && (
+                      <div className="mt-2 text-xs font-bold text-orange-600">
+                        👉 次の案内
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* エラー表示 */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-700">
