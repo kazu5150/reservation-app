@@ -3,11 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Reservation } from '@/types/reservation';
-import {
-  MinecraftPickaxe,
-  MinecraftDiamond,
-  FloatingBlocks
-} from '@/components/MinecraftDecorations';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -68,15 +63,15 @@ export default function AdminPage() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'waiting':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-amber-100 text-amber-800 border-amber-300';
       case 'in_progress':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
       case 'completed':
         return 'bg-blue-100 text-blue-800 border-blue-300';
       case 'cancelled':
         return 'bg-red-100 text-red-800 border-red-300';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-slate-100 text-slate-800 border-slate-300';
     }
   };
 
@@ -113,65 +108,60 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 flex items-center justify-center relative overflow-hidden">
-        <FloatingBlocks />
-        <div className="text-center relative z-10">
-          <div className="animate-pixel-pulse mb-4">
-            <MinecraftPickaxe className="mx-auto" />
-          </div>
-          <p className="mt-4 text-gray-900 font-bold minecraft-text">読み込み中...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="mt-4 text-slate-600 font-medium">読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 py-8 px-4 relative overflow-hidden">
-      <FloatingBlocks />
-      <div className="max-w-6xl mx-auto relative z-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
         {/* ヘッダー */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6 border-4 border-green-600">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-3">
-              <MinecraftPickaxe className="w-12 h-12" />
-              <h1 className="text-3xl font-bold text-gray-900 minecraft-text">
-                ⚙️ 管理画面
-              </h1>
-            </div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              管理画面
+            </h1>
             <button
               onClick={() => router.push('/')}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition border-4 border-green-800 minecraft-text transform hover:scale-105"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
             >
-              🏠 トップページ
+              トップページ
             </button>
           </div>
 
           {/* 統計情報 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
-              <div className="text-yellow-800 text-sm font-semibold mb-1">待機中</div>
-              <div className="text-3xl font-bold text-yellow-900">{waitingCount}</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+              <div className="text-amber-700 text-xs font-medium mb-2">待機中</div>
+              <div className="text-4xl font-bold text-amber-900">{waitingCount}</div>
+              <div className="text-amber-600 text-xs mt-1">人</div>
             </div>
-            <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-              <div className="text-green-800 text-sm font-semibold mb-1">体験中</div>
-              <div className="text-3xl font-bold text-green-900">{inProgressCount}</div>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
+              <div className="text-emerald-700 text-xs font-medium mb-2">体験中</div>
+              <div className="text-4xl font-bold text-emerald-900">{inProgressCount}</div>
+              <div className="text-emerald-600 text-xs mt-1">人</div>
             </div>
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-              <div className="text-blue-800 text-sm font-semibold mb-1">完了</div>
-              <div className="text-3xl font-bold text-blue-900">{completedCount}</div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+              <div className="text-blue-700 text-xs font-medium mb-2">完了</div>
+              <div className="text-4xl font-bold text-blue-900">{completedCount}</div>
+              <div className="text-blue-600 text-xs mt-1">人</div>
             </div>
           </div>
         </div>
 
         {/* 次の案内対象者 */}
         {availableSeats > 0 && nextToCall.length > 0 && (
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl shadow-md p-6 mb-6 border-4 border-orange-400">
+          <div className="bg-orange-50 rounded-lg shadow-sm border border-orange-200 p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-3xl">📢</div>
-              <h2 className="text-2xl font-bold text-gray-900 minecraft-text">
+              <h2 className="text-xl font-semibold text-slate-900">
                 次の案内
               </h2>
-              <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+              <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                 {availableSeats}席空き
               </span>
             </div>
@@ -180,27 +170,27 @@ export default function AdminPage() {
               {nextToCall.map((reservation) => (
                 <div
                   key={reservation.id}
-                  className="bg-white rounded-lg p-4 border-4 border-orange-300 shadow-lg transform hover:scale-105 transition"
+                  className="bg-white rounded-lg p-4 border-2 border-orange-300 shadow-sm"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <div className="text-4xl font-bold text-orange-600 mb-1">
+                      <div className="text-3xl font-bold text-orange-600 mb-1">
                         {reservation.queue_number}
                       </div>
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-base font-semibold text-slate-900">
                         {reservation.name}様
                       </div>
                     </div>
-                    <div className="bg-yellow-100 px-2 py-1 rounded text-xs font-semibold text-yellow-800">
+                    <div className="bg-amber-100 px-2 py-1 rounded text-xs font-medium text-amber-800 border border-amber-200">
                       待機中
                     </div>
                   </div>
 
                   <button
                     onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition border-4 border-orange-700 transform hover:scale-105 minecraft-text"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
                   >
-                    ▶️ 案内開始
+                    案内開始
                   </button>
                 </div>
               ))}
@@ -210,13 +200,12 @@ export default function AdminPage() {
 
         {/* 待機中の方一覧 */}
         {waitingReservations.length > 0 && (
-          <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl shadow-md p-6 mb-6 border-4 border-yellow-400">
+          <div className="bg-amber-50 rounded-lg shadow-sm border border-amber-200 p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-3xl">⏳</div>
-              <h2 className="text-2xl font-bold text-gray-900 minecraft-text">
+              <h2 className="text-xl font-semibold text-slate-900">
                 待機中の方
               </h2>
-              <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+              <span className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                 {waitingReservations.length}人
               </span>
             </div>
@@ -225,30 +214,30 @@ export default function AdminPage() {
               {waitingReservations.map((reservation, index) => (
                 <div
                   key={reservation.id}
-                  className={`bg-white rounded-lg p-3 border-2 shadow ${
+                  className={`bg-white rounded-lg p-3 border shadow-sm ${
                     index < availableSeats
-                      ? 'border-orange-400 bg-orange-50'
-                      : 'border-yellow-300'
+                      ? 'border-orange-300 bg-orange-50'
+                      : 'border-amber-200'
                   }`}
                 >
                   <div className="text-center">
-                    <div className={`text-3xl font-bold mb-1 ${
-                      index < availableSeats ? 'text-orange-600' : 'text-yellow-600'
+                    <div className={`text-2xl font-bold mb-1 ${
+                      index < availableSeats ? 'text-orange-600' : 'text-amber-600'
                     }`}>
                       {reservation.queue_number}
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">
+                    <div className="text-sm font-semibold text-slate-900">
                       {reservation.name}様
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-slate-500 mt-1">
                       {new Date(reservation.created_at).toLocaleTimeString('ja-JP', {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
                     </div>
                     {index < availableSeats && (
-                      <div className="mt-2 text-xs font-bold text-orange-600">
-                        👉 次の案内
+                      <div className="mt-2 text-xs font-semibold text-orange-600">
+                        次の案内
                       </div>
                     )}
                   </div>
@@ -260,78 +249,75 @@ export default function AdminPage() {
 
         {/* エラー表示 */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-700">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6 text-red-700 text-sm">
             {error}
           </div>
         )}
 
         {/* 予約一覧 */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden border-4 border-blue-600">
-          <div className="p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <MinecraftDiamond className="w-8 h-8" />
-                <h2 className="text-xl font-bold text-gray-900 minecraft-text">📋 予約一覧</h2>
-              </div>
+              <h2 className="text-xl font-semibold text-slate-900">予約一覧</h2>
               <button
                 onClick={fetchReservations}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm border-4 border-blue-800 minecraft-text transform hover:scale-105"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition text-sm shadow-sm"
               >
-                🔄 更新
+                更新
               </button>
             </div>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs text-slate-500 mt-2">
               10秒ごとに自動更新されます
             </p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     番号
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     名前
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     ステータス
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     受付時刻
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-slate-200">
                 {reservations.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
                       予約がありません
                     </td>
                   </tr>
                 ) : (
                   reservations.map((reservation) => (
-                    <tr key={reservation.id} className="hover:bg-gray-50">
+                    <tr key={reservation.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-2xl font-bold text-gray-900">
+                        <div className="text-xl font-bold text-slate-900">
                           {reservation.queue_number}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-slate-900">
                           {reservation.name}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getStatusBadgeColor(reservation.status)}`}>
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded border ${getStatusBadgeColor(reservation.status)}`}>
                           {getStatusText(reservation.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                         {new Date(reservation.created_at).toLocaleString('ja-JP')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -339,25 +325,25 @@ export default function AdminPage() {
                           {reservation.status === 'waiting' && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
-                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded transition border-2 border-green-800 font-bold transform hover:scale-105 text-xs sm:text-sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg transition font-semibold text-xs"
                             >
-                              ▶️ 開始
+                              開始
                             </button>
                           )}
                           {reservation.status === 'in_progress' && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'completed')}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded transition border-2 border-blue-800 font-bold transform hover:scale-105 text-xs sm:text-sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition font-semibold text-xs"
                             >
-                              ✅ 完了
+                              完了
                             </button>
                           )}
                           {(reservation.status === 'waiting' || reservation.status === 'in_progress') && (
                             <button
                               onClick={() => updateStatus(reservation.queue_number, 'cancelled')}
-                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded transition border-2 border-red-800 font-bold transform hover:scale-105 text-xs sm:text-sm"
+                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition font-semibold text-xs"
                             >
-                              ❌
+                              キャンセル
                             </button>
                           )}
                         </div>

@@ -3,12 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { WaitInfo } from '@/types/reservation';
-import {
-  MinecraftCharacter,
-  MinecraftGrassBlock,
-  MinecraftDiamond,
-  FloatingBlocks
-} from '@/components/MinecraftDecorations';
 
 export default function WaitPage() {
   const params = useParams();
@@ -55,13 +49,10 @@ export default function WaitPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 flex items-center justify-center p-4 relative overflow-hidden">
-        <FloatingBlocks />
-        <div className="text-center relative z-10">
-          <div className="animate-pixel-pulse mb-4">
-            <MinecraftCharacter />
-          </div>
-          <p className="mt-4 text-gray-900 font-bold minecraft-text">読み込み中...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="mt-4 text-slate-600 font-medium">読み込み中...</p>
         </div>
       </div>
     );
@@ -69,18 +60,21 @@ export default function WaitPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 flex items-center justify-center p-4 relative overflow-hidden">
-        <FloatingBlocks />
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full border-4 border-red-600 relative z-10">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-sm border border-red-200 p-8 max-w-md w-full">
           <div className="text-center">
-            <div className="text-red-500 text-5xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2 minecraft-text">エラー</h1>
-            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-semibold text-slate-900 mb-2">エラー</h1>
+            <p className="text-slate-600 mb-6">{error}</p>
             <button
               onClick={() => router.push('/')}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition border-4 border-green-800 minecraft-text"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
             >
-              🏠 トップページに戻る
+              トップページに戻る
             </button>
           </div>
         </div>
@@ -106,74 +100,57 @@ export default function WaitPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'waiting':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-100 text-amber-800 border border-amber-200';
       case 'in_progress':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
       case 'completed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 border border-blue-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 border border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-100 text-slate-800 border border-slate-200';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-100 via-blue-50 to-blue-100 flex items-center justify-center p-4 relative overflow-hidden">
-      <FloatingBlocks />
-
-      {/* 地面のブロック */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-2 pb-4">
-        <MinecraftGrassBlock />
-        <MinecraftGrassBlock />
-        <MinecraftGrassBlock />
-        <MinecraftGrassBlock />
-        <MinecraftGrassBlock />
-      </div>
-
-      <div className="max-w-4xl w-full relative z-10">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border-4 border-green-600">
-          {/* マインクラフトキャラクター */}
-          <div className="flex justify-center mb-6">
-            <div className="animate-pixel-pulse">
-              <MinecraftCharacter />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
-          </div>
-
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2 minecraft-text">
-              ✅ 受付完了
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              受付完了
             </h1>
-            <div className="flex justify-center gap-2 mb-2">
-              <MinecraftDiamond className="w-6 h-6" />
-              <MinecraftDiamond className="w-6 h-6" />
-            </div>
-            <p className="text-gray-600 font-semibold">
+            <p className="text-slate-600">
               以下の番号でお待ちください
             </p>
           </div>
 
           {waitInfo && (
             <>
-              <div className="bg-blue-50 rounded-xl p-8 mb-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 mb-6">
                 <div className="text-center">
-                  <div className="text-sm text-gray-600 mb-2">あなたの番号</div>
+                  <div className="text-sm text-slate-600 mb-2">あなたの番号</div>
                   <div className="text-6xl font-bold text-blue-600 mb-4">
                     {waitInfo.queue_number}
                   </div>
-                  <div className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(waitInfo.current_status)}`}>
+                  <div className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(waitInfo.current_status)}`}>
                     {getStatusText(waitInfo.current_status)}
                   </div>
 
                   {/* 待ち時間を番号カード内に表示 */}
                   {waitInfo.current_status === 'waiting' && (
-                    <div className="mt-6 pt-6 border-t-2 border-blue-200">
-                      <div className="text-sm text-gray-600 mb-2">予想待ち時間</div>
+                    <div className="mt-6 pt-6 border-t border-blue-200">
+                      <div className="text-sm text-slate-600 mb-2">予想待ち時間</div>
                       <div className="text-5xl font-bold text-blue-600 mb-1">
                         約{waitInfo.estimated_wait_minutes}
                       </div>
-                      <div className="text-sm text-gray-600">分</div>
-                      <div className="text-xs text-gray-500 mt-2">
+                      <div className="text-sm text-slate-600">分</div>
+                      <div className="text-xs text-slate-500 mt-2">
                         （待ち人数: {waitInfo.position - 1}人）
                       </div>
                     </div>
@@ -182,62 +159,68 @@ export default function WaitPage() {
               </div>
 
               {waitInfo.current_status === 'in_progress' && (
-                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6 text-center">
-                  <p className="text-green-800 font-semibold text-lg">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6 text-center">
+                  <p className="text-emerald-800 font-semibold">
                     まもなくあなたの番です
                   </p>
-                  <p className="text-green-700 mt-2">
+                  <p className="text-emerald-700 text-sm mt-1">
                     スタッフの指示に従ってください
                   </p>
                 </div>
               )}
 
               {waitInfo.current_status === 'completed' && (
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6 text-center">
-                  <p className="text-blue-800 font-semibold text-lg">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+                  <p className="text-blue-800 font-semibold">
                     体験ありがとうございました
                   </p>
                 </div>
               )}
 
-              <div className="text-center text-sm text-gray-500 mb-6">
+              <div className="text-center text-xs text-slate-500 mb-6">
                 30秒ごとに自動更新されます
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
                   onClick={fetchWaitInfo}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition border-4 border-blue-800 minecraft-text transform hover:scale-105"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
                 >
-                  🔄 手動で更新
+                  手動で更新
                 </button>
 
                 <button
                   onClick={() => router.push('/')}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition border-4 border-green-800 minecraft-text transform hover:scale-105"
+                  className="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition shadow-sm"
                 >
-                  🏠 トップページに戻る
+                  トップページに戻る
                 </button>
               </div>
             </>
           )}
         </div>
 
-        <div className="mt-6 bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-4 border-2 border-green-400">
-          <h2 className="font-bold text-gray-900 mb-2 minecraft-text flex items-center gap-2">
-            📋 注意事項
+        <div className="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h2 className="font-semibold text-slate-900 mb-3 text-sm">
+            注意事項
           </h2>
-          <ul className="text-sm text-gray-700 space-y-2">
+          <ul className="text-sm text-slate-600 space-y-2">
             <li className="flex items-center gap-2">
-              <span className="text-green-600">🟩</span>
+              <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
               <span>この画面を閉じても順番は保持されます</span>
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-blue-600">🟦</span>
+              <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
               <span>番号が呼ばれたら受付へお越しください</span>
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-yellow-600">🟨</span>
+              <svg className="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
               <span>不明な点はスタッフにお尋ねください</span>
             </li>
           </ul>
