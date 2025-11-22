@@ -23,6 +23,7 @@ export interface Seat {
   seat_name: string;
   name: string;
   remaining_minutes: number;
+  queue_number: number;
 }
 
 export interface OvertimeSeat {

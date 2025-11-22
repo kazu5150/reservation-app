@@ -64,6 +64,7 @@ class Seat(BaseModel):
     seat_name: str  # 席名（A席、B席、C席）
     name: str  # 利用者名
     remaining_minutes: float  # 残り時間（分）
+    queue_number: int  # 予約番号
 
 class OvertimeSeat(BaseModel):
     seat_name: str  # 席名（A席、B席、C席）
@@ -383,7 +384,8 @@ async def get_stats():
                     seats_info.append(Seat(
                         seat_name=seat_names[idx],
                         name=reservation.get("name", "Unknown"),
-                        remaining_minutes=round(remaining_minutes, 1)
+                        remaining_minutes=round(remaining_minutes, 1),
+                        queue_number=reservation.get("queue_number", 0)
                     ))
 
         # 残り時間でソート（早く空く順）

@@ -56,6 +56,32 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // ステータス更新
+  const updateStatus = async (queueNumber: number, newStatus: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/reservations/${queueNumber}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('ステータスの更新に失敗しました');
+      }
+
+      // 更新後に再取得
+      fetchStats();
+      fetchWaitingList();
+    } catch (err) {
+      alert('ステータスの更新に失敗しました');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -176,12 +202,19 @@ export default function Home() {
                           </span>
                         </div>
                         {/* プログレスバー */}
-                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden mb-2">
                           <div
                             className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-500"
                             style={{ width: `${progress}%` }}
                           />
                         </div>
+                        {/* 完了ボタン */}
+                        <button
+                          onClick={() => updateStatus(seat.queue_number, 'completed')}
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded text-xs transition"
+                        >
+                          完了
+                        </button>
                       </div>
                     );
                   })}
@@ -198,14 +231,22 @@ export default function Home() {
                     {waitingList.map((reservation) => (
                       <div
                         key={reservation.queue_number}
-                        className="bg-white rounded border border-amber-200 p-2 text-center"
+                        className="bg-white rounded border border-amber-200 p-2"
                       >
-                        <div className="text-xl font-bold text-amber-600">
-                          {reservation.queue_number}
+                        <div className="text-center mb-2">
+                          <div className="text-xl font-bold text-amber-600">
+                            {reservation.queue_number}
+                          </div>
+                          <div className="text-xs text-slate-600">
+                            {reservation.name}様
+                          </div>
                         </div>
-                        <div className="text-xs text-slate-600">
-                          {reservation.name}様
-                        </div>
+                        <button
+                          onClick={() => updateStatus(reservation.queue_number, 'in_progress')}
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-1 px-2 rounded text-xs transition"
+                        >
+                          開始
+                        </button>
                       </div>
                     ))}
                   </div>
