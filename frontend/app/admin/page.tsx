@@ -19,7 +19,9 @@ export default function AdminPage() {
       }
 
       const data = await response.json();
-      setReservations(data);
+      // 降順（新しい順）にソート
+      const sortedData = data.sort((a: Reservation, b: Reservation) => b.queue_number - a.queue_number);
+      setReservations(sortedData);
       setLoading(false);
     } catch (err) {
       setError('予約情報の取得に失敗しました');
