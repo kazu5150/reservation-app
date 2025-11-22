@@ -164,32 +164,22 @@ export default function WaitPage() {
                   <div className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(waitInfo.current_status)}`}>
                     {getStatusText(waitInfo.current_status)}
                   </div>
+
+                  {/* 待ち時間を番号カード内に表示 */}
+                  {waitInfo.current_status === 'waiting' && (
+                    <div className="mt-6 pt-6 border-t-2 border-blue-200">
+                      <div className="text-sm text-gray-600 mb-2">予想待ち時間</div>
+                      <div className="text-5xl font-bold text-blue-600 mb-1">
+                        約{waitInfo.estimated_wait_minutes}
+                      </div>
+                      <div className="text-sm text-gray-600">分</div>
+                      <div className="text-xs text-gray-500 mt-2">
+                        （待ち人数: {waitInfo.position - 1}人）
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {waitInfo.current_status === 'waiting' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <span className="text-gray-600 mb-2">待ち人数</span>
-                      <span className="text-4xl font-bold text-gray-900">
-                        {waitInfo.position - 1}
-                      </span>
-                      <span className="text-gray-600 text-sm mt-1">人</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <span className="text-gray-600 mb-2">予想待ち時間</span>
-                      <span className="text-4xl font-bold text-gray-900">
-                        {waitInfo.estimated_wait_minutes}
-                      </span>
-                      <span className="text-gray-600 text-sm mt-1">分</span>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {waitInfo.current_status === 'in_progress' && (
                 <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6 text-center">
