@@ -245,6 +245,13 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 今日の体験者数 */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6 text-center mb-6">
+              <div className="text-purple-700 text-base font-semibold mb-3">今日の体験者数</div>
+              <div className="text-6xl font-bold text-purple-900">{stats.today_completed_count}</div>
+              <div className="text-purple-600 text-base mt-2">人</div>
+            </div>
+
             {/* 予想待ち時間 */}
             <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center mb-6">
               <div className="text-blue-700 text-base font-semibold mb-3">予想待ち時間</div>

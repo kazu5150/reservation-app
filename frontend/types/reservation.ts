@@ -41,6 +41,7 @@ export interface Stats {
   waiting_count: number;
   in_progress_count: number;
   completed_count: number;
+  today_completed_count: number;
   estimated_wait_minutes: number;
   seats: Seat[];
   overtime_seats: OvertimeSeat[];

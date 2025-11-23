@@ -86,6 +86,7 @@ class Stats(BaseModel):
     waiting_count: int  # 待機中の人数
     in_progress_count: int  # 体験中の人数
     completed_count: int  # 完了した人数
+    today_completed_count: int  # 今日完了した人数
     estimated_wait_minutes: int  # 現在の予想待ち時間（分）
     seats: List[Seat]  # 各席の情報
     overtime_seats: List[OvertimeSeat]  # 超過している席の情報
@@ -428,6 +429,13 @@ async def get_stats():
         # 現在の予想待ち時間を計算（体験開始時刻を考慮）
         now = datetime.now(timezone.utc)
 
+        # 今日の開始時刻（UTC）
+        today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # 今日完了した予約を取得
+        today_completed_response = supabase.table("reservations").select("*", count="exact").eq("status", "completed").gte("completed_at", today_start.isoformat()).execute()
+        today_completed_count = today_completed_response.count if today_completed_response.count is not None else 0
+
         # 体験中の各予約の残り時間を計算
         slot_available_times = []  # 各枠が空くまでの時間（分）
         seats_info = []  # 各席の情報
@@ -511,6 +519,7 @@ async def get_stats():
             waiting_count=waiting_count,
             in_progress_count=in_progress_count,
             completed_count=completed_count,
+            today_completed_count=today_completed_count,
             estimated_wait_minutes=estimated_wait_minutes,
             seats=seats_info,
             overtime_seats=overtime_seats_info
