@@ -182,14 +182,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="max-w-7xl w-full">
+    <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-3">
+      <div className="max-w-7xl w-full h-full flex items-center">
         {/* PC画面では横並び、モバイルでは縦並び */}
-        <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-4 w-full">
           {/* 左側: 待ち状況表示 */}
           {stats && (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6 lg:mb-0">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-4 lg:mb-0 max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">
                 現在の待ち状況
               </h2>
 
@@ -229,47 +229,47 @@ export default function Home() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-3 mb-4">
               {/* 待機中の人数 */}
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center">
-                <div className="text-amber-700 text-base font-semibold mb-3">待機中</div>
-                <div className="text-6xl font-bold text-amber-900">{stats.waiting_count}</div>
-                <div className="text-amber-600 text-base mt-2">人</div>
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-center">
+                <div className="text-amber-700 text-sm font-semibold mb-2">待機中</div>
+                <div className="text-5xl font-bold text-amber-900">{stats.waiting_count}</div>
+                <div className="text-amber-600 text-sm mt-1">人</div>
               </div>
 
               {/* 体験中の人数 */}
-              <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
-                <div className="text-emerald-700 text-base font-semibold mb-3">体験中</div>
-                <div className="text-6xl font-bold text-emerald-900">{stats.in_progress_count}</div>
-                <div className="text-emerald-600 text-base mt-2">人</div>
+              <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 text-center">
+                <div className="text-emerald-700 text-sm font-semibold mb-2">体験中</div>
+                <div className="text-5xl font-bold text-emerald-900">{stats.in_progress_count}</div>
+                <div className="text-emerald-600 text-sm mt-1">人</div>
               </div>
             </div>
 
             {/* 今日の体験者数 */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6 text-center mb-6">
-              <div className="text-purple-700 text-base font-semibold mb-3">今日の体験者数</div>
-              <div className="text-6xl font-bold text-purple-900">{stats.today_completed_count}</div>
-              <div className="text-purple-600 text-base mt-2">人</div>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-4 text-center mb-4">
+              <div className="text-purple-700 text-sm font-semibold mb-2">今日の体験者数</div>
+              <div className="text-5xl font-bold text-purple-900">{stats.today_completed_count}</div>
+              <div className="text-purple-600 text-sm mt-1">人</div>
             </div>
 
             {/* 予想待ち時間 */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center mb-6">
-              <div className="text-blue-700 text-base font-semibold mb-3">予想待ち時間</div>
-              <div className="text-6xl font-bold text-blue-900">
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center mb-4">
+              <div className="text-blue-700 text-sm font-semibold mb-2">予想待ち時間</div>
+              <div className="text-5xl font-bold text-blue-900">
                 {stats.estimated_wait_minutes}
               </div>
-              <div className="text-blue-600 text-base mt-2">分</div>
+              <div className="text-blue-600 text-sm mt-1">分</div>
             </div>
 
             {/* 席の状況 */}
             {stats.seats && stats.seats.length > 0 && (
-              <div className="space-y-4 mb-6">
-                <h3 className="text-lg font-bold text-slate-700 mb-4">各席の状況</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
+              <div className="space-y-2 mb-4">
+                <h3 className="text-base font-bold text-slate-700 mb-2">各席の状況</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
                   {stats.seats.map((seat) => {
                     const progress = (seat.remaining_minutes / 10) * 100;
                     return (
-                      <div key={seat.seat_name} className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
+                      <div key={seat.seat_name} className="bg-slate-50 border-2 border-slate-200 rounded-xl p-3">
                         <div className="flex justify-between items-center mb-3">
                           <div className="flex items-center gap-3">
                             <span className="text-xl font-bold text-slate-900">{seat.seat_name}</span>
@@ -302,16 +302,16 @@ export default function Home() {
 
             {/* 待機者リスト */}
             {waitingList.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-slate-700 mb-4">待機中の方</h3>
-                <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-5">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <h3 className="text-base font-bold text-slate-700 mb-2">待機中の方</h3>
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                     {waitingList.map((reservation) => (
                       <div
                         key={reservation.queue_number}
-                        className="bg-white rounded-lg border-2 border-amber-200 p-4"
+                        className="bg-white rounded-lg border-2 border-amber-200 p-3"
                       >
-                        <div className="text-center mb-3">
+                        <div className="text-center mb-2">
                           <div className="text-3xl font-bold text-amber-600">
                             {reservation.queue_number}
                           </div>
@@ -346,8 +346,8 @@ export default function Home() {
           )}
 
           {/* 右側: 受付フォーム */}
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
-          <div className="text-center mb-8">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 max-h-[calc(100vh-2rem)] overflow-y-auto">
+          <div className="text-center mb-6">
             {/* 現在の日時表示 */}
             <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
               <div className="text-blue-900 text-2xl font-bold mb-1">
@@ -417,33 +417,6 @@ export default function Home() {
             </div>
           </div>
           </div>
-        </div>
-
-        {/* ご案内セクション（下部に全幅で表示） */}
-        <div className="mt-6 bg-slate-50 border-2 border-slate-200 rounded-xl p-6">
-          <h2 className="font-bold text-slate-900 mb-4 text-lg">
-            ご案内
-          </h2>
-          <ul className="text-base text-slate-600 space-y-3">
-            <li className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>体験時間: 約10分</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>受付後、待ち番号をお伝えします</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>待ち時間の目安を確認できます</span>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
