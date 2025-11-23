@@ -60,6 +60,16 @@ class WaitInfo(BaseModel):
     estimated_wait_minutes: int  # 予想待ち時間（分）
     current_status: str
 
+class ReservationWithWaitTime(BaseModel):
+    id: str
+    queue_number: int
+    name: str
+    status: str
+    created_at: datetime
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    estimated_wait_minutes: int  # 予想待ち時間（分）
+
 class Seat(BaseModel):
     seat_name: str  # 席名（A席、B席、C席）
     name: str  # 利用者名
@@ -324,6 +334,78 @@ async def get_waiting_reservations():
     try:
         response = supabase.table("reservations").select("*").eq("status", "waiting").order("queue_number").execute()
         return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 待機中の予約一覧取得（待ち時間付き）
+@app.get("/reservations/waiting/with-wait-times", response_model=List[ReservationWithWaitTime])
+async def get_waiting_reservations_with_wait_times():
+    """
+    待機中の予約一覧を待ち時間情報付きで取得
+    """
+    try:
+        # 待機中の予約を取得
+        waiting_response = supabase.table("reservations").select("*").eq("status", "waiting").order("queue_number").execute()
+
+        # 現在体験中の予約を取得
+        in_progress_response = supabase.table("reservations").select("*").eq("status", "in_progress").execute()
+        in_progress_count = len(in_progress_response.data) if in_progress_response.data else 0
+
+        # 現在時刻
+        now = datetime.now(timezone.utc)
+
+        # 体験中の各予約の残り時間を計算
+        slot_available_times = []
+        for res in (in_progress_response.data or []):
+            if res.get("started_at"):
+                try:
+                    started_at_str = res["started_at"]
+                    if started_at_str.endswith('Z'):
+                        started_at_str = started_at_str[:-1] + '+00:00'
+                    started_at = datetime.fromisoformat(started_at_str)
+                    elapsed_minutes = (now - started_at).total_seconds() / 60
+                    remaining_minutes = max(0, EXPERIENCE_DURATION_MINUTES - elapsed_minutes)
+                    slot_available_times.append(remaining_minutes)
+                except Exception:
+                    slot_available_times.append(EXPERIENCE_DURATION_MINUTES)
+
+        # 残り時間でソート（早く空く順）
+        slot_available_times.sort()
+
+        # 利用可能な枠の数
+        available_slots = MAX_CONCURRENT_EXPERIENCES - in_progress_count
+
+        # すぐに使える枠を追加
+        for _ in range(available_slots):
+            slot_available_times.insert(0, 0)
+
+        # 各待機中の予約に待ち時間を計算
+        result = []
+        timeline = slot_available_times[:MAX_CONCURRENT_EXPERIENCES].copy()
+        while len(timeline) < MAX_CONCURRENT_EXPERIENCES:
+            timeline.append(0)
+
+        for idx, reservation in enumerate(waiting_response.data or []):
+            # 一番早く空く枠を使用
+            earliest_available = min(timeline)
+            wait_time = int(math.ceil(earliest_available))
+
+            # この枠が次に空く時刻を更新
+            timeline.remove(earliest_available)
+            timeline.append(earliest_available + EXPERIENCE_DURATION_MINUTES)
+
+            result.append(ReservationWithWaitTime(
+                id=reservation["id"],
+                queue_number=reservation["queue_number"],
+                name=reservation["name"],
+                status=reservation["status"],
+                created_at=reservation["created_at"],
+                started_at=reservation.get("started_at"),
+                completed_at=reservation.get("completed_at"),
+                estimated_wait_minutes=wait_time
+            ))
+
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

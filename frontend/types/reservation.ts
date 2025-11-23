@@ -8,6 +8,10 @@ export interface Reservation {
   completed_at?: string;
 }
 
+export interface ReservationWithWaitTime extends Reservation {
+  estimated_wait_minutes: number;
+}
+
 export interface WaitInfo {
   queue_number: number;
   position: number;

@@ -2,20 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Stats } from '@/types/reservation';
-
-interface WaitingReservation {
-  queue_number: number;
-  name: string;
-}
+import { Stats, ReservationWithWaitTime } from '@/types/reservation';
 
 export default function Home() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<Stats | null>(null);
-  const [waitingList, setWaitingList] = useState<WaitingReservation[]>([]);
+  const [waitingList, setWaitingList] = useState<ReservationWithWaitTime[]>([]);
   const [alertedSeats, setAlertedSeats] = useState<Set<number>>(new Set());
+  const [currentTime, setCurrentTime] = useState(new Date());
   const router = useRouter();
 
   // アラート音を鳴らす関数
@@ -57,10 +53,10 @@ export default function Home() {
     }
   };
 
-  // 待機中のリストを取得
+  // 待機中のリストを取得（待ち時間付き）
   const fetchWaitingList = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservations/waiting/list`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservations/waiting/with-wait-times`);
       if (response.ok) {
         const data = await response.json();
         setWaitingList(data);
@@ -81,6 +77,15 @@ export default function Home() {
     }, 10000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // 現在時刻を1秒ごとに更新
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   // 残り時間が0になった席を検知してアラートを鳴らす
@@ -303,8 +308,19 @@ export default function Home() {
                           <div className="text-3xl font-bold text-amber-600">
                             {reservation.queue_number}
                           </div>
-                          <div className="text-base text-slate-600">
+                          <div className="text-base text-slate-600 mb-2">
                             {reservation.name}様
+                          </div>
+                          {/* 待ち時間表示 */}
+                          <div className={`text-lg font-bold ${
+                            reservation.estimated_wait_minutes === 0
+                              ? 'text-green-600'
+                              : 'text-blue-600'
+                          }`}>
+                            {reservation.estimated_wait_minutes === 0
+                              ? 'すぐ案内可能'
+                              : `約${reservation.estimated_wait_minutes}分待ち`
+                            }
                           </div>
                         </div>
                         <button
@@ -325,6 +341,25 @@ export default function Home() {
           {/* 右側: 受付フォーム */}
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <div className="text-center mb-8">
+            {/* 現在の日時表示 */}
+            <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
+              <div className="text-blue-900 text-2xl font-bold mb-1">
+                {currentTime.toLocaleDateString('ja-JP', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  weekday: 'long'
+                })}
+              </div>
+              <div className="text-blue-700 text-4xl font-bold tabular-nums">
+                {currentTime.toLocaleTimeString('ja-JP', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                })}
+              </div>
+            </div>
+
             <h1 className="text-3xl font-bold text-slate-900 mb-3">
               プログラミング体験会
             </h1>

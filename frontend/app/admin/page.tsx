@@ -2,26 +2,37 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Reservation } from '@/types/reservation';
+import { Reservation, ReservationWithWaitTime } from '@/types/reservation';
 
 export default function AdminPage() {
   const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [waitingWithTimes, setWaitingWithTimes] = useState<ReservationWithWaitTime[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const fetchReservations = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservations`);
+      const [reservationsResponse, waitingTimesResponse] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservations`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservations/waiting/with-wait-times`)
+      ]);
 
-      if (!response.ok) {
+      if (!reservationsResponse.ok) {
         throw new Error('予約情報の取得に失敗しました');
       }
 
-      const data = await response.json();
+      const data = await reservationsResponse.json();
       // 降順（新しい順）にソート
       const sortedData = data.sort((a: Reservation, b: Reservation) => b.queue_number - a.queue_number);
       setReservations(sortedData);
+
+      // 待機中の予約の待ち時間情報を取得
+      if (waitingTimesResponse.ok) {
+        const waitingData = await waitingTimesResponse.json();
+        setWaitingWithTimes(waitingData);
+      }
+
       setLoading(false);
     } catch (err) {
       setError('予約情報の取得に失敗しました');
@@ -96,10 +107,8 @@ export default function AdminPage() {
   const inProgressCount = reservations.filter((r) => r.status === 'in_progress').length;
   const completedCount = reservations.filter((r) => r.status === 'completed').length;
 
-  // 次の案内対象者を取得（待機中の予約を番号順にソート）
-  const waitingReservations = reservations
-    .filter((r) => r.status === 'waiting')
-    .sort((a, b) => a.queue_number - b.queue_number);
+  // 待機中の予約一覧（待ち時間付き）を使用
+  const waitingReservations = waitingWithTimes;
 
   // 空いている席の数を計算
   const MAX_CONCURRENT = 3;
@@ -237,8 +246,19 @@ export default function AdminPage() {
                         minute: '2-digit'
                       })}
                     </div>
+                    {/* 待ち時間表示 */}
+                    <div className={`mt-2 text-lg font-bold ${
+                      reservation.estimated_wait_minutes === 0
+                        ? 'text-green-600'
+                        : 'text-blue-600'
+                    }`}>
+                      {reservation.estimated_wait_minutes === 0
+                        ? 'すぐ案内可能'
+                        : `約${reservation.estimated_wait_minutes}分待ち`
+                      }
+                    </div>
                     {index < availableSeats && (
-                      <div className="mt-2 text-sm font-bold text-orange-600">
+                      <div className="mt-1 text-sm font-bold text-orange-600">
                         次の案内
                       </div>
                     )}
